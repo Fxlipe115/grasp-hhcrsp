@@ -64,27 +64,27 @@ class HhcrspInstance:
             'nbServi' + '\n' + \
             str(self.nbServi) + '\n' + \
             'r' + '\n' + \
-            str(self.r) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.r)) + '\n' + \
             'DS' + '\n' + \
-            str(self.DS) + '\n' + \
+            ' '.join(str(x) for x in self.DS) + '\n' + \
             'a' + '\n' + \
-            str(self.a) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.a)) + '\n' + \
             'x' + '\n' + \
-            str(self.x) + '\n' + \
+            ' '.join(str(x) for x in self.x) + '\n' + \
             'y' + '\n' + \
-            str(self.y) + '\n' + \
+            ' '.join(str(x) for x in self.y) + '\n' + \
             'd' + '\n' + \
-            str(self.d) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.d)) + '\n' + \
             'p' + '\n' + \
-            str(self.p) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.p)) + '\n' + \
             'mind' + '\n' + \
-            str(self.mind) + '\n' + \
+            ' '.join(str(x) for x in self.mind) + '\n' + \
             'maxd' + '\n' + \
-            str(self.maxd) + '\n' + \
+            ' '.join(str(x) for x in self.maxd) + '\n' + \
             'e' + '\n' + \
-            str(self.e) + '\n' + \
+            ' '.join(str(x) for x in self.e) + '\n' + \
             'l' + '\n' + \
-            str(self.l) 
+            ' '.join(str(x) for x in self.l) 
 
 
 # Functions goes here
