@@ -93,10 +93,10 @@ class HhcrspInstance:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GRASP-GGCRSP')
     parser.add_argument('-f', dest='file', required=True, help='The instance file.\n')
-    parser.add_argument('-o', help='Output Filename, for best solution and time elapsed')
+    parser.add_argument('-o', dest='outfile', help='Output Filename, for best solution and time elapsed')
 
     args = parser.parse_args()
-    out = sys.stdout if args.o is None else open(args.o, 'w')
+    out = sys.stdout if args.outfile is None else open(args.outfile, 'w')
 
     instance = HhcrspInstance(args.file)
 
