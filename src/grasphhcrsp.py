@@ -109,10 +109,6 @@ class HhcrspInstance:
             ' '.join(str(x) for x in self.l) 
 
 
-# Functions goes here ========================= START CODING FROM HERE =====================================
-
-filepath="" # <================================ put a filepath here pls
-instance = HhcrspInstance(filepath)
 
 class patient:
     timeWindowBegin=0
@@ -132,18 +128,6 @@ class vehicle:
 
 
 
-# BUILDING A LIST OF ALL PATIENTS
-listPatients=[]
-
-for i in range(instance.nbNodes):
-    if(i!=0 and i!=instance.nbNodes):
-        if (i in instance.DS):
-            needy=1
-        else:
-            needy=0
-        
-        newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
-        listPatients.append(newpatient)
 
 
 # Type of variable that will hold the time of start and end of a service given to a patient
@@ -153,12 +137,6 @@ class serviceTime:
         self.end = end
 
 
-rows = instance.nbNodes - 2 # <=== Correto eliminar os nodos garagem? i guess
-columns=2
-
-serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
-
-#    serviceTimes[service1][service2] 
 
 def howLate(patient,endOfService):
     lateness = endOfService - patient.timeWindowEnd
@@ -256,9 +234,9 @@ def noNegatives(serviceTimeList):      #RESTRIÇÃO (14) DO ARTIGO
 
     return true
 
-#def timesAreIncreasing(visitedNodes,servicetimes):
-
-   #TODO
+def timesAreIncreasing(visitedNodes,servicetimes):
+    pass
+   # TODO
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GRASP-GGCRSP')
@@ -269,6 +247,26 @@ if __name__ == '__main__':
     out = sys.stdout if args.outfile is None else open(args.outfile, 'w')
 
     instance = HhcrspInstance(args.file)
+
+    # BUILDING A LIST OF ALL PATIENTS
+    listPatients=[]
+
+    for i in range(instance.nbNodes):
+        if(i!=0 and i!=instance.nbNodes):
+            if (i in instance.DS):
+                needy=1
+            else:
+                needy=0
+            
+            newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
+            listPatients.append(newpatient)
+            
+    rows = instance.nbNodes - 2 # <=== Correto eliminar os nodos garagem? i guess
+    columns=2
+
+    serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
+
+    # serviceTimes[service1][service2] 
 
     # always pass file=out parameter to print
     # just to test parameter reading
