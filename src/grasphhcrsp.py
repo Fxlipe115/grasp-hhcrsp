@@ -77,7 +77,7 @@ class HhcrspInstance:
 
             _ = f.readline()
             self.l = [int(x) for x in f.readline().split()]
-            
+
     def __str__(self):
         return 'nbNodes' + '\n' + \
             str(self.nbNodes) + '\n' + \
@@ -106,7 +106,7 @@ class HhcrspInstance:
             'e' + '\n' + \
             ' '.join(str(x) for x in self.e) + '\n' + \
             'l' + '\n' + \
-            ' '.join(str(x) for x in self.l) 
+            ' '.join(str(x) for x in self.l)
 
 
 
@@ -118,13 +118,13 @@ class patient:
 
     def __init__(self, windowB,windowE,requiredserv, isNeedful):
         self.timeWindowBegin = windowB
-        self.timeWindowEnd = windowE 
+        self.timeWindowEnd = windowE
         self.requiredServices = requiredserv
         self.doubleservice = isNeedful
 
 class vehicle:
     def __init__(self, givenServices):
-        self.services = givenServices 
+        self.services = givenServices
 
 
 
@@ -181,10 +181,10 @@ def buildsDistanceList(visitedNodes):
         distances.append(instance.d[origin][destination])
         i+=1
 
-    return distances 
+    return distances
 
 
-# soma dos seguintes fatores seja mínima:  Distâncias percorridas pelos veículos; 
+# soma dos seguintes fatores seja mínima:  Distâncias percorridas pelos veículos;
 # Soma dos atrasos nos atendimentos; Tempo do maior atraso observado na solução.
 
 #listofVehiclesRoutes = List of lists, number of vehicles X maximum number of houses visiteds by a vehicle
@@ -217,7 +217,7 @@ def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
 
 def TreatmentAfterWindowBegins(serviceTimeList,patientlist): #RESTRIÇÃO (9) DO ARTIGO
 
-    for person in serviceTimeList:      # Para cada linha (pessoa) na tabela de horários de serviços feitos 
+    for person in serviceTimeList:      # Para cada linha (pessoa) na tabela de horários de serviços feitos
             if(serviceTimeList[person][0].beg < patientlist[person].timeWindowBegin): #Se horario de inicio do tratamento < começo da janela do paciente
                 return false
             elif(patientlist[person].isNeedful==1):             #Se paciente quer 2 serviços
@@ -230,7 +230,7 @@ def noNegatives(serviceTimeList):      #RESTRIÇÃO (14) DO ARTIGO
 
     for person in serviceTimeList:
         if(person[0].beg < 0 or person[1].beg <0):    # <======= REVIEW THIS TO ME
-            return false 
+            return false
 
     return true
 
@@ -257,16 +257,16 @@ if __name__ == '__main__':
                 needy=1
             else:
                 needy=0
-            
+
             newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
             listPatients.append(newpatient)
-            
+
     rows = instance.nbNodes - 2 # <=== Correto eliminar os nodos garagem? i guess
     columns=2
 
     serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
 
-    # serviceTimes[service1][service2] 
+    # serviceTimes[service1][service2]
 
     # always pass file=out parameter to print
     # just to test parameter reading
