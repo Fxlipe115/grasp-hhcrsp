@@ -4,6 +4,24 @@ import argparse
 import sys
 
 class HhcrspInstance:
+    """An instance of the problem HHCRSP
+
+    Attributes:
+        nbNodes     Number of nodes in the network; note that the depot is counted as the first(0) and the last(ndNodes-1) node.
+        nbVehi      Number of staff members (vehicles).
+        nbServi     Number of service types.
+        r           Service requirement of each patient.
+        DS          Patients,who require double service.
+        a           Qualification of staff members.
+        x           x-coordinates of the nodes.
+        y           y-coordinates of the nodes.
+        d           Distance matrix.
+        p           Processing time of each service at each patient provided by each staff member.
+        mind        Minimal time gap between service activities for double service patients.
+        maxd        Maximal time gap between service activities for double service patients.
+        e           Beginning of time window.
+        l           End of time window.
+    """
     def __init__(self, file_path):
         with open(file_path) as f:
             _ = f.readline()
