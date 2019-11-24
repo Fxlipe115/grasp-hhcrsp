@@ -3,6 +3,10 @@
 import argparse
 import sys
 
+
+
+
+
 class HhcrspInstance:
     """An instance of the problem HHCRSP
 
@@ -105,8 +109,156 @@ class HhcrspInstance:
             ' '.join(str(x) for x in self.l) 
 
 
-# Functions goes here
+# Functions goes here ========================= START CODING FROM HERE =====================================
 
+filepath="" # <================================ put a filepath here pls
+instance = HhcrspInstance(filepath)
+
+class patient:
+    timeWindowBegin=0
+    timeWindowEnd=0
+    requiredServices=0
+    doubleservice=0
+
+    def __init__(self, windowB,windowE,requiredserv, isNeedful):
+        self.timeWindowBegin = windowB
+        self.timeWindowEnd = windowE 
+        self.requiredServices = requiredserv
+        self.doubleservice = isNeedful
+
+class vehicle:
+    def __init__(self, givenServices):
+        self.services = givenServices 
+
+
+
+# BUILDING A LIST OF ALL PATIENTS
+listPatients=[]
+
+for i in range(instance.nbNodes):
+    if(i!=0 and i!=instance.nbNodes):
+        if (i in instance.DS):
+            needy=1
+        else:
+            needy=0
+        
+        newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
+        listPatients.append(newpatient)
+
+
+# Type of variable that will hold the time of start and end of a service given to a patient
+class serviceTime:
+    def __init__(self,start, end):
+        self.beg = start
+        self.end = end
+
+
+rows = instance.nbNodes - 2 # <=== Correto eliminar os nodos garagem? i guess
+columns=2
+
+serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
+
+#    serviceTimes[service1][service2] 
+
+def howLate(patient,endOfService):
+    lateness = endOfService - patient.timeWindowEnd
+    if(lateness <= 0):
+        return 0
+    else:
+        return lateness
+
+#============================================================================REVIEW THIS FUNCTION BELOW FOR ME
+#Returns both the sum of all late services, and the biggest of all
+def AlltheLateness(patients,serviceTimes):
+
+    allLateness=0
+    listofLates=[]
+    index = 0
+
+    for i in patients:
+        late = howLate(i,serviceTimes[index][0].end)        #Gets how late was the service
+        allLateness+=late
+        listofLates.append(late)
+
+        if(i.isNeedful == 1):                       #if patient requires two services, counts it too
+            late = howLate(i,serviceTimes[index][1].end)
+            allLateness+=late
+            listofLates.append(late)
+
+        index+=1
+
+    return allLateness, max(listofLates), listofLates
+
+
+#Receives a list of visited nodes of ONE CAR and spits the distance list between all of them
+#assuming we already have the distance matrix drawed from the instance file.
+def buildsDistanceList(visitedNodes):
+
+    i=0
+    distances=[]
+
+    while(i<visitedNodes.len() - 1): # <=== doesn't go to the last element
+        origin = visitedNodes[i]
+        destination = visitedNodes[i+1]
+        distances.append(instance.d[origin][destination])
+        i+=1
+
+    return distances 
+
+
+# soma dos seguintes fatores seja mínima:  Distâncias percorridas pelos veículos; 
+# Soma dos atrasos nos atendimentos; Tempo do maior atraso observado na solução.
+
+#listofVehiclesRoutes = List of lists, number of vehicles X maximum number of houses visiteds by a vehicle
+#patientsTimes = a list of lists of elements of type serviceTime
+def objective(listofVehiclesRoutes , patientsTimes):
+
+    for car in listofVehicles:
+        totalDistance += sum(buildsDistanceList( listofVehiclesRoutes[car]) )
+
+    lateness,biggestLate,listlates = AlltheLateness(patientsTimes)
+
+    objectiveValue = totalDistance + latness + biggestLate
+
+    return objectiveValue
+
+########################################## FUNÇÕES QUE CHECAM AS RESTRIÇÕES : #####################################
+
+def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
+
+    firstNode = visitedNodes[0]
+    lastNode = visitedNodes[visitedNodes.len()-1]
+
+    xGarage = instance.x[0]
+    yGarage = instance.y[0]
+
+    if(instance.x[firstNode] == xGarage and instance.y[firstNode]== yGarage and instance.x[lastNode] == xGarage and instance.y[lastNode]==yGarage):
+        return true
+    else:
+        return false
+
+def TreatmentAfterWindowBegins(serviceTimeList,patientlist): #RESTRIÇÃO (9) DO ARTIGO
+
+    for person in serviceTimeList:      # Para cada linha (pessoa) na tabela de horários de serviços feitos 
+            if(serviceTimeList[person][0].beg < patientlist[person].timeWindowBegin): #Se horario de inicio do tratamento < começo da janela do paciente
+                return false
+            elif(patientlist[person].isNeedful==1):             #Se paciente quer 2 serviços
+                if(serviceTimeList[person][1].beg < patientlist[person].timeWindowBegin): #checa o segundo horario de tratamento do paciente
+                    return false
+
+    return true
+
+def noNegatives(serviceTimeList):      #RESTRIÇÃO (14) DO ARTIGO
+
+    for person in serviceTimeList:
+        if(person[0].beg < 0 or person[1].beg <0):    # <======= REVIEW THIS TO ME
+            return false 
+
+    return true
+
+#def timesAreIncreasing(visitedNodes,servicetimes):
+
+   #TODO
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GRASP-GGCRSP')
