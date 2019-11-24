@@ -1,4 +1,4 @@
-#!/user/bin/env python3
+#!/usr/bin/env python3
 
 import argparse
 import sys
@@ -270,6 +270,6 @@ if __name__ == '__main__':
 
     # always pass file=out parameter to print
     # just to test parameter reading
-    print(instance, file=out)
+    # print(instance, file=out)
 
     # TODO everything else
