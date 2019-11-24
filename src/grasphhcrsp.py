@@ -238,6 +238,46 @@ def timesAreIncreasing(visitedNodes,servicetimes):
     pass
    # TODO
 
+
+
+def greedyRandomizedAlgortithm(alpha):
+    # TODO
+    pass
+
+def isFeasible(S):
+    # TODO
+    return True
+
+def repairSolution(S):
+    # TODO
+    return S
+
+def localSearch(S):
+    # TODO
+    return S
+
+def f(S):
+    # TODO
+    return float('inf')
+
+
+def GRASP(maxIter, alpha):
+    score = float('inf')
+    for i in range(maxIter):
+        S = greedyRandomizedAlgortithm(alpha)
+        if not isFeasible(S):
+            S = repairSolution(S)
+        S = localSearch(S)
+        if f(S) < score:
+            solution = S
+            score = f(S)
+
+    return solution
+
+
+
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GRASP-GGCRSP')
     parser.add_argument('-f', dest='file', required=True, help='The instance file.\n')
