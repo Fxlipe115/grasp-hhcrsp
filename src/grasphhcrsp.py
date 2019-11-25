@@ -127,15 +127,10 @@ class vehicle:
         self.services = givenServices
 
 class carService:
-    patient =0
-    service =0
-    start=0
-    end=0
-
     def __init__(self,patient,service,b,e):
         self.patient = patient
-        self.service = service 
-        self.start = b 
+        self.service = service
+        self.start = b
         self.end = e
 
 
@@ -149,34 +144,22 @@ class serviceTime:
 
 
 
-def howLate(patient,endOfService):
-    lateness = endOfService - patient.timeWindowEnd
-    if(lateness <= 0):
-        return 0
-    else:
-        return lateness
+def howLate(carService, numNodes):
+    if service is not None:
+        if service.patient != 0 and service.patient != numNodes-1:
+            lateness = endOfService - service.patient.timeWindowEnd
+            if(lateness > 0):
+                return lateness
+    return 0
 
 #============================================================================REVIEW THIS FUNCTION BELOW FOR ME
 #Returns both the sum of all late services, and the biggest of all
-def AlltheLateness(patients,serviceTimes):
+def allTheLateness(matrix):
+    numNodes=len(matrix[0])
+    allServices = reduce(lambda x,y: x+y, matrix,[])
+    listOfLates= map(howLate, allServices)
 
-    allLateness=0
-    listofLates=[]
-    index = 0
-
-    for i in patients:
-        late = howLate(i,serviceTimes[index][0].end)        #Gets how late was the service
-        allLateness+=late
-        listofLates.append(late)
-
-        if(i.isNeedful == 1):                       #if patient requires two services, counts it too
-            late = howLate(i,serviceTimes[index][1].end)
-            allLateness+=late
-            listofLates.append(late)
-
-        index+=1
-
-    return allLateness, max(listofLates), listofLates
+    return sum(listOfLates), max(listOfLates)
 
 
 #Receives a list of visited nodes of ONE CAR and spits the distance list between all of them
