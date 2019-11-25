@@ -164,7 +164,7 @@ def allTheLateness(matrix, numNodes):
 
 #Receives a list of visited nodes of ONE CAR and spits the distance list between all of them
 #assuming we already have the distance matrix drawed from the instance file.
-def buildsDistanceList(visitedNodes):
+def buildsDistanceList(visitedNodes,instance):
 
     i=0
     distances=[]
@@ -178,7 +178,7 @@ def buildsDistanceList(visitedNodes):
     return distances
 
 
-def canItServeIt(vehicle,patient,service): # ============ REVIEW THIS FUNCTION PLS
+def canItServeIt(vehicle,patient,service,instance): # ============ REVIEW THIS FUNCTION PLS
     
     if(instance.a[vehicle][service] == patient.requiredServices[service]):
             return true
@@ -222,7 +222,7 @@ def objective(listofVehiclesRoutes , patientsTimes):
 
 ########################################## FUNÇÕES QUE CHECAM AS RESTRIÇÕES : #####################################
 
-def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
+def outAndBackToGarage(visitedNodes,instance):  #RESTRIÇÃO (5) DO ARTIGO
 
     firstNode = visitedNodes[0].node
     lastNode = visitedNodes[visitedNodes.len()-1].node
@@ -312,15 +312,15 @@ if __name__ == '__main__':
     listPatients=[]
 
     for i in range(instance.nbNodes):
-        if(i!=0 and i!=instance.nbNodes-1):
-            if (i in instance.DS):
+        if i!=1 and i!=instance.nbNodes:
+            if i+1 in instance.DS:
                 needy=1
             else:
                 needy=0
 
             newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
             listPatients.append(newpatient)
-        elif(i==0 or i== instance.nbNodes-1):
+        elif i==1 or i== instance.nbNodes:
             newpatient = None #REVIEW
             listPatients.append(newpatient)
 
