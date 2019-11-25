@@ -128,11 +128,15 @@ class vehicle:
 
 class carService:
     patient =0
-    service =0;
+    service =0
+    start=0
+    end=0
 
-    def __init__(self,patient,service):
+    def __init__(self,patient,service,b,e):
         self.patient = patient
         self.service = service 
+        self.start = b 
+        self.end = e
 
 
 
@@ -237,8 +241,8 @@ def objective(listofVehiclesRoutes , patientsTimes):
 
 def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
 
-    firstNode = visitedNodes[0]
-    lastNode = visitedNodes[visitedNodes.len()-1]
+    firstNode = visitedNodes[0].node
+    lastNode = visitedNodes[visitedNodes.len()-1].node
 
     xGarage = instance.x[0]
     yGarage = instance.y[0]
@@ -351,9 +355,7 @@ if __name__ == '__main__':
 
     # serviceTimes[service1][service2]
 
-    columns2 = instance.nbServi 
-
-    servedBy = [[ 0 for i in range(columns2) ] for j in range(rows)]
+    
 
 
     # always pass file=out parameter to print
