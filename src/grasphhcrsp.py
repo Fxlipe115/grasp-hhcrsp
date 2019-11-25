@@ -113,7 +113,7 @@ class HhcrspInstance:
 class patient:
     timeWindowBegin=0
     timeWindowEnd=0
-    requiredServices=0
+    requiredServices=[]
     doubleservice=0
 
     def __init__(self, windowB,windowE,requiredserv, isNeedful):
@@ -126,6 +126,13 @@ class vehicle:
     def __init__(self, givenServices):
         self.services = givenServices
 
+class carService:
+    patient =0
+    service =0;
+
+    def __init__(self,patient,service):
+        self.patient = patient
+        self.service = service 
 
 
 
@@ -176,12 +183,38 @@ def buildsDistanceList(visitedNodes):
     distances=[]
 
     while(i<visitedNodes.len() - 1): # <=== doesn't go to the last element
-        origin = visitedNodes[i]
-        destination = visitedNodes[i+1]
+        origin = visitedNodes[i].node
+        destination = visitedNodes[i+1].node
         distances.append(instance.d[origin][destination])
         i+=1
 
     return distances
+
+
+def canItServeIt(vehicle,patient,service): # ============ REVIEW THIS FUNCTION PLS
+    
+    if(instance.a[vehicle][service] == patient.requiredServices[service]):
+            return true
+    
+    return false
+
+
+
+
+def whoServedit(listofAllroutes, nservices, npatients):
+
+
+    whoservedit = [[ -1 for i in range(nservices) ] for j in range(npatients)]
+
+    for index,car in enumerate(listofAllroutes):
+        for service in car:
+            if(service.node!=0 and service.node != npatients-1):
+                whoservedit[service.node][service.service] = index
+
+    return whoservedit
+
+
+
 
 
 # soma dos seguintes fatores seja mínima:  Distâncias percorridas pelos veículos;
@@ -292,7 +325,7 @@ if __name__ == '__main__':
     listPatients=[]
 
     for i in range(instance.nbNodes):
-        if(i!=0 and i!=instance.nbNodes):
+        if(i!=0 and i!=instance.nbNodes-1):
             if (i in instance.DS):
                 needy=1
             else:
@@ -300,13 +333,28 @@ if __name__ == '__main__':
 
             newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
             listPatients.append(newpatient)
+        elif(i==0 or i== instance.nbNodes-1):
+            newpatient = None #REVIEW
+            listPatients.append(newpatient)
 
-    rows = instance.nbNodes - 2 # <=== Correto eliminar os nodos garagem? i guess
+
+
+
+
+
+    rows = instance.nbNodes 
     columns=2
 
     serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
+    serviceTimes[0] = None # <==== NODOS GARAGEM
+    serviceTimes[rows-1] = None
 
     # serviceTimes[service1][service2]
+
+    columns2 = instance.nbServi 
+
+    servedBy = [[ 0 for i in range(columns2) ] for j in range(rows)]
+
 
     # always pass file=out parameter to print
     # just to test parameter reading
