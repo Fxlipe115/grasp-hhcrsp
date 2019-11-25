@@ -112,11 +112,6 @@ class HhcrspInstance:
 
 
 class patient:
-    timeWindowBegin=0
-    timeWindowEnd=0
-    requiredServices=[]
-    doubleservice=0
-
     def __init__(self, windowB,windowE,requiredserv, isNeedful):
         self.timeWindowBegin = windowB
         self.timeWindowEnd = windowE
@@ -176,6 +171,24 @@ def buildsDistanceList(visitedNodes,instance):
         i+=1
 
     return distances
+
+
+def getProcessingTime(instance,patientIdx,vehicleIdx,serviceIdx):
+    return instance.p[patientIdx*instance.nbVehi+vehicleIdx][serviceIdx]
+
+def buildCarServiceMatrix(instance,patientList,routes):
+    timesMatrix = []
+    for vehicleIdx,route in enumerate(routes):
+        times = [0]*instance.nbNodes
+        for i in range(1,len(route)):
+            times[i] = times[i-1] + getProcessingTime(instance,route[i][0],vehicleIdx,route[i][1])
+        timesMatrix.append(times)
+
+    carServiceMatrix = [[None]*instance.nbNodes for _ in range(instance.nbVehi)]
+    for vehicleIdx,route in enumerate(routes):
+        for i in range(1,len(route)-1):
+            cs = carService(patientList[patientIdx],route[i][1],timesMatrix[vehicleIdx][route[i][0]],timesMatrix[vehicleIdx][route[i][0]]+getProcessingTime(instance,route[i][0],vehicleIdx,route[i][1]))
+            carServiceMatrix[vehicleIdx][route[i][0]] = cs
 
 
 def canItServeIt(vehicle,patient,service,instance): # ============ REVIEW THIS FUNCTION PLS
@@ -312,20 +325,16 @@ if __name__ == '__main__':
     listPatients=[]
 
     for i in range(instance.nbNodes):
-        if i!=1 and i!=instance.nbNodes:
+        newpatient = None
+        if i!=0 and i!=instance.nbNodes-1:
             if i+1 in instance.DS:
                 needy=1
             else:
                 needy=0
-
             newpatient = patient(instance.e[i],instance.l[i],instance.r[i],needy)
-            listPatients.append(newpatient)
-        elif i==1 or i== instance.nbNodes:
+        elif i==0 or i== instance.nbNodes-1:
             newpatient = None #REVIEW
-            listPatients.append(newpatient)
-
-
-
+        listPatients.append(newpatient)
 
 
 
