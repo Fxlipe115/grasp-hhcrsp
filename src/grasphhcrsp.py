@@ -155,8 +155,7 @@ def howLate(carService, numNodes):
 
 #============================================================================REVIEW THIS FUNCTION BELOW FOR ME
 #Returns both the sum of all late services, and the biggest of all
-def allTheLateness(matrix):
-    numNodes=len(matrix[0])
+def allTheLateness(matrix, numNodes):
     allServices = reduce(lambda x,y: x+y, matrix,[])
     listOfLates= map(howLate, allServices)
 
