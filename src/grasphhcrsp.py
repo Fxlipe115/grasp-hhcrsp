@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from functools import reduce
 
 
 
