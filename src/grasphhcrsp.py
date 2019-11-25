@@ -235,7 +235,7 @@ def objective(listofVehiclesRoutes , patientsTimes):
 
 ########################################## FUNÇÕES QUE CHECAM AS RESTRIÇÕES : #####################################
 
-def outAndBackToGarage(visitedNodes,instance):  #RESTRIÇÃO (5) DO ARTIGO
+def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
 
     firstNode = visitedNodes[0].node
     lastNode = visitedNodes[visitedNodes.len()-1].node
@@ -244,32 +244,57 @@ def outAndBackToGarage(visitedNodes,instance):  #RESTRIÇÃO (5) DO ARTIGO
     yGarage = instance.y[0]
 
     if(instance.x[firstNode] == xGarage and instance.y[firstNode]== yGarage and instance.x[lastNode] == xGarage and instance.y[lastNode]==yGarage):
-        return true
+        return True
     else:
-        return false
+        return False
 
-def TreatmentAfterWindowBegins(serviceTimeList,patientlist): #RESTRIÇÃO (9) DO ARTIGO
+def TreatmentAfterWindowBegins(Allrouteslist,patientlist):
 
-    for person in serviceTimeList:      # Para cada linha (pessoa) na tabela de horários de serviços feitos
-            if(serviceTimeList[person][0].beg < patientlist[person].timeWindowBegin): #Se horario de inicio do tratamento < começo da janela do paciente
-                return false
-            elif(patientlist[person].isNeedful==1):             #Se paciente quer 2 serviços
-                if(serviceTimeList[person][1].beg < patientlist[person].timeWindowBegin): #checa o segundo horario de tratamento do paciente
-                    return false
+    for route in Allrouteslist:
+        for service in route:
+            if(patientlist[service.node] != None):
+                if(service.start < patientlist[service.node].timeWindowBegin):
+                return False 
+    return True
 
-    return true
+def noNegatives(Allrouteslist, numbernodes):      #RESTRIÇÃO (14) DO ARTIGO
 
-def noNegatives(serviceTimeList):      #RESTRIÇÃO (14) DO ARTIGO
+    for route in Allrouteslist:
+        for serv in route:
+            if(serv.node != 0 and serv.node != numbernodes-1 and serv != None):
+                if(serv.start <0):
+                    return False
 
-    for person in serviceTimeList:
-        if(person[0].beg < 0 or person[1].beg <0):    # <======= REVIEW THIS TO ME
-            return false
 
-    return true
+    return True
 
-def timesAreIncreasing(visitedNodes,servicetimes):
-    pass
-   # TODO
+#checa uma linha da matriz de solução       RESTRIÇÃO (8) <====MELHORAR C DISTANCIAS
+def timesAreIncreasing(visitedNodes):
+    
+    tempoanterior = 0
+    nodoanterior=0
+
+    for service in visitedNodes:
+        if(service != None):
+            if(service.start < tempoanterior):
+                return False
+            tempoanterior = service.start
+            nodoanterior = service.node
+
+
+    return True
+
+def allServicesDone(patientlist,servedBy):
+
+    index=0
+    for patient in patientList:
+        if patient != None:
+            for i in range(nbServi):
+                if(patient.requiredServices[i]==1 and servedBy[index][i] == -1):
+                    return False 
+        index+=1
+
+    return True
 
 
 
