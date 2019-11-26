@@ -379,18 +379,14 @@ def repairSolution(S):
     # TODO
     return S
 
-def localSearch(S):
-    # TODO
-    return S
-
 def f(S):
     # TODO
     return float('inf')
 
-def learn(self, instance,patientList,routes,numberOfNeighbours):
+def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     number_of_neighbours = 30
 
-    current_state = buildCarServiceMatrix(instance,patientList,routes)
+    carServiceMatrix = buildCarServiceMatrix(instance,patientList,routes)
 
     def generate_Neighbours(numberOfNeighbours, routes):
         new_neighbours = []
@@ -411,38 +407,25 @@ def learn(self, instance,patientList,routes,numberOfNeighbours):
     episode=0
     iteration=0
     data=[]
-    score_current = self.run_episode(current_state)
+    score_current = objective(instance, carServiceMatrix, patientList)
     best_episode=-1
     for i in range(30):
         neighbours = generate_Neighbours(number_of_neighbours,weights)
         best_neighbour = current_state
-        score_best_neighbour = self.run_episode(best_neighbour)
-        #data.append((iteration,episode,score_best_neighbour))
+        score_best_neighbour = objective(instance, carServiceMatrix, patientList)
         episode+=1
         best_score = score_current
         for current_neighbour in neighbours:
             cur_score = self.run_episode(current_neighbour)
-            #data.append((iteration,episode,cur_score))
             if cur_score  > score_best_neighbour:
                 best_neighbour = current_neighbour
                 best_score = cur_score
                 best_episode=episode
                 data.append((iteration,episode,score_best_neighbour))
-            #if episode%50 == 0:
-                #data.append((iteration,episode,score_best_neighbour))
             episode+=1
         if score_best_neighbour > score_current:
             current_state = best_neighbour
         iteration+=1
-
-        print('{0}/30 score: {1}'.format(i+1,best_score))
-
-    print('Final score: {0}'.format(self.run_episode(current_state)))
-
-    with open('hillclimb-f4-'+str(tiny_disturbance)+'.csv', 'a') as f:
-        f.write('iteration,episode,score\n')
-        for d in data:
-            f.write(','.join(map(str,d))+'\n')
 
     return current_state
 
