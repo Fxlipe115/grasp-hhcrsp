@@ -273,53 +273,6 @@ def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
     else:
         return False
 
-def TreatmentAfterWindowBegins(Allrouteslist,patientlist): #<========= REVIEW <===NODE?
-
-    for route in Allrouteslist:
-        for service in route:
-            if(patientlist[service.node] != None):
-                if(service.start < patientlist[service.node].timeWindowBegin):
-                    return False
-    return True
-
-def noNegatives(Allrouteslist, numbernodes):      #RESTRIÇÃO (14) DO ARTIGO
-
-    for route in Allrouteslist:
-        for serv in route:
-            if(serv.node != 0 and serv.node != numbernodes-1 and serv != None):
-                if(serv.start <0):
-                    return False
-
-
-    return True
-
-#checa uma linha da matriz de solução       RESTRIÇÃO (8) <====MELHORAR C DISTANCIAS
-def timesAreIncreasing(visitedNodes):
-
-    tempoanterior = 0
-    nodoanterior=0
-
-    for service in visitedNodes:
-        if(service != None):
-            if(service.start < tempoanterior):
-                return False
-            tempoanterior = service.start
-            nodoanterior = service.node
-
-
-    return True
-
-def allServicesDone(patientlist,servedBy):
-
-    index=0
-    for patient in patientList:
-        if patient != None:
-            for i in range(nbServi):
-                if(patient.requiredServices[i]==1 and servedBy[index][i] == -1):
-                    return False
-        index+=1
-
-    return True
 
 def geraPendentes(matriz,listadepacientes,numser):
 
@@ -333,18 +286,22 @@ def geraPendentes(matriz,listadepacientes,numser):
     return pendentes
 
 #recebe lista de serviços pendentes, numero de veiculos e a lista dos serviços dos veiculos
-def geraRCL(pendentes, nveiculos, servicosveiculos,patientlist):
+def geraRCL(pendentes, nveiculos, servicosveiculos,patientlist,instance):
     rcl = []
     for services in pendentes:
       #  print(services[0],"AAAAAAAAAAAAAAAAAAAAAAAA")
         for i in range(nveiculos):
             if (servicosveiculos[i][services[1]] == 1):
-                rcl.append([i,services[0],services[1],custo(services[0],patientlist)]) #carro serviço nodo custo
+                rcl.append([i,services[0],services[1],custo(instance, services[0],i,services[1])]) #carro serviço nodo custo
 
     return rcl
 
-def custo(patient,patientlist):
-    return patientlist[patient].timeWindowBegin
+
+def custo(instance,patient,vehic,service):
+    return getProcessingTime(instance,patient,vehic,service)
+
+    
+    #   #Critério de Ordenação: Pacientes cujo final da janela de tempo ocorre mais cedo primeiro
 
 def selectsCandidate(rcl, alpha):
     considerados = math.ceil(len(rcl) * alpha)
@@ -374,9 +331,11 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
         rotas[i].append([0,-1])
 
     pendentes = geraPendentes(matrix,patientlist,instance.nbServi)
+    pendentes.sort(key=lambda x: patientlist[x[0]].timeWindowEnd )
+
 
     while(len(pendentes) > 0):
-        rcl = geraRCL(pendentes,instance.nbVehi,instance.a, patientlist)
+        rcl = geraRCL(pendentes,instance.nbVehi,instance.a, patientlist,instance)
 
         chosen = selectsCandidate(rcl,alpha)
 
@@ -392,27 +351,6 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
 
     return rotas
 
-def recalculaTempos(ServiceMatrix, patientlist,distancias,instance):
-
-    linhas = len(ServiceMatrix)
-    #distance=0                              #matriz[i][nodo].patient #matriz[i][nodo].serviço
-
-    for i in range(linhas):
-        tempofinalanterior=0
-        for nodo in range(len(ServiceMatrix[i])):
-            if(nodo!=0):
-                tempoinicial = tempofinalanterior+distancias[ServiceMatrix[i][nodo].patient][ServiceMatrix[i][nodo-1].patient]
-                if(tempoinicial < patientlist[ServiceMatrix[i][nodo].patient].timeWindowBegin):
-                    tempoinicial = patientlist[nodo].timeWindowBegin
-                tempofinal= tempoinicial + getProcessingTime(instance,ServiceMatrix[i][nodo].patient,i,ServiceMatrix[i][nodo].service)
-
-                ServiceMatrix[i][nodo].start = tempoinicial
-                ServiceMatrix[i][nodo].end = tempofinal
-
-                tempofinalanterior = tempofinal
-
-
-
 
 def swapPatients(route1,route2,service):
     patient1Idx = list(map(lambda x: x[1], route1)).index(service)
@@ -420,20 +358,9 @@ def swapPatients(route1,route2,service):
 
     route1[patient1Idx],route2[patient2Idx] = route2[patient2Idx],route1[patient1Idx]
 
-def isFeasible(S):
-    # TODO
-    return True
-
-def repairSolution(S):
-    # TODO
-    return S
-
-def f(S):
-    # TODO
-    return float('inf')
 
 def localSearch(instance,patientList,routes,numberOfNeighbours):
-    number_of_neighbours = 30
+    
 
 
     current_state = copy(routes)
@@ -481,7 +408,7 @@ def localSearch(instance,patientList,routes,numberOfNeighbours):
     for i in range(1):
 
         #print("Generating Neighbours\n")
-        neighbours = generate_Neighbours(routes,number_of_neighbours,current_state,instance,instance.nbVehi,patientList)
+        neighbours = generate_Neighbours(routes,numberOfNeighbours,current_state,instance,instance.nbVehi,patientList)
   #      best_neighbour = current_state
   #      score_best_neighbour = objective(instance, carServiceMatrix, patientList)
   #      episode+=1
@@ -502,6 +429,12 @@ def localSearch(instance,patientList,routes,numberOfNeighbours):
 
     return current_state
 
+def initialSolution(instance):
+    ncarros = instance.nbVehi
+    nPacientes = instance.nbNodes
+
+
+
 def GRASP(maxIter, alpha, patientList, instance):
 
     score = float('inf')
@@ -520,7 +453,7 @@ def GRASP(maxIter, alpha, patientList, instance):
             bestSolution = copy(S)
             bestScore = greedyScore
 
-        S = localSearch(instance,patientList,S,10)
+        S = localSearch(instance,patientList,S,50)
         ServiceMatrix = buildCarServiceMatrix(instance,patientList,S)    #objective(instance, carServiceMatrix, patientList):
         newscore = objective(instance,ServiceMatrix,patientList)
                                                     #def buildCarServiceMatrix(instance,patientList,routes):
