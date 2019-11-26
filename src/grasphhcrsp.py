@@ -339,6 +339,12 @@ def commonServices(veiculo1,veiculo2,instance):
     return common
 
 
+def swapPatients(route1,route2,service):
+    patient1Idx = list(map(lambda x: x[1], route1)).index(service)
+    patient2Idx = list(map(lambda x: x[1], route2)).index(service)
+
+    route1[patient1Idx],route2[patient2Idx] = route2[patient2Idx],route1[patient1Idx]
+
 
 def greedyRandomizedAlgortithm(alpha):
     
