@@ -303,10 +303,10 @@ def geraPendentes(matriz,listadepacientes):
 
     pendentes=[]
 
-    for paciente in matriz:
-        for serviço in range(len(paciente)):
-            if(listadepacientes[paciente].requiredServices[servico]==1 and matriz[paciente][servico]==-1):
-                pendentes.append([paciente,serviço])
+    for i,paciente in enumerate(matriz):
+        for servico in range(len(paciente)):
+            if listadepacientes[i].requiredServices[servico]==1 and paciente[servico]==-1:
+                pendentes.append([paciente,servico])
 
     return pendentes
 
