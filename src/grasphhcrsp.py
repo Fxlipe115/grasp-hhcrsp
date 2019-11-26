@@ -139,14 +139,14 @@ class serviceTime:
     def __init__(self,start, end):
         self.beg = start
         self.end = end
+        
 
+def howLate(carService,numNodes, patientlist):
 
-
-def howLate(carService, numNodes):
-    if service is not None:
-        if service.patient != 0 and service.patient != numNodes-1:
-            lateness = endOfService - service.patient.timeWindowEnd
-            if(lateness > 0):
+    if carService != None:
+        if carService.patient != 0 and carService.patient != numNodes -1:
+            lateness = carService.end - patientlist[carService.patient].timeWindowEnd
+            if(lateness>0):
                 return lateness
     return 0
 
@@ -358,7 +358,7 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,rotas,nveiculos
         rotas[chosen[0]].append([chosen[1], chosen[2]]) #rotas[veiculo escolhido].append(paciente escolhido, serviço escolhido)
         matrix[chosen[1]][chosen[2]] = t[0]
 
-        pendentes.remove([chosen[1],chosen[2]])
+        pendentes.remove([chosen[1],chosen[2]])     # Retira dos pendentes, o (paciente,serviço) que foi selecionado
     
     for i in range(nveiculos):              #TODOS VEICULOS VOLTAM PRA GARAGEM
         rotas[i].append([0,-1])
