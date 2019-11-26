@@ -350,17 +350,8 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,rotas,nveiculos
 
     pendentes = geraPendentes(matrix,patientlist) 
 
-<<<<<<< HEAD
     while(pendentes.len() > 0):
         rcl = geraRCL(pendentes,instance.nbVehi,instance.a)
-=======
-def swapPatients(route1,route2,service):
-    patient1Idx = list(map(lambda x: x[1], route1)).index(service)
-    patient2Idx = list(map(lambda x: x[1], route2)).index(service)
-
-    route1[patient1Idx],route2[patient2Idx] = route2[patient2Idx],route1[patient1Idx]
-
->>>>>>> e18e3c8d38a4612d9a100a42792084769fea7868
 
         chosen = selectsCandidate(rcl,alpha)
 
@@ -373,6 +364,12 @@ def swapPatients(route1,route2,service):
         rotas[i].append([0,-1])
 
     return rotas
+
+def swapPatients(route1,route2,service):
+    patient1Idx = list(map(lambda x: x[1], route1)).index(service)
+    patient2Idx = list(map(lambda x: x[1], route2)).index(service)
+
+    route1[patient1Idx],route2[patient2Idx] = route2[patient2Idx],route1[patient1Idx]
 
 def isFeasible(S):
     # TODO
