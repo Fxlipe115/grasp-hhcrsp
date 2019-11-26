@@ -156,7 +156,7 @@ def howLate(carService,numNodes, patientlist):
 def allTheLateness(matrix, numNodes, patientList):
 
     late=0
-    listlates=[]
+    listlates=[0]
 
     for car in matrix:
         for carserv in car:
@@ -253,7 +253,7 @@ def objective(instance, carServiceMatrix, patientList):
 
     lateness,biggestLate = allTheLateness(carServiceMatrix, instance.nbNodes, patientList)
 
-    objectiveValue = totalDistance + latness + biggestLate
+    objectiveValue = totalDistance + lateness + biggestLate
 
     return objectiveValue
 
