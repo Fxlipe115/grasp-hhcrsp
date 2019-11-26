@@ -394,20 +394,34 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     carServiceMatrix = buildCarServiceMatrix(instance,patientList,routes)
     current_state = copy(routes)
 
-    def generate_Neighbours(numberOfNeighbours, routes):
+    def generate_Neighbours(numberOfNeighbours, routes, instancia, nveiculos):
+
         new_neighbours = []
         for i in range(0,numberOfNeighbours):
-            new_weights = list(weights)
-            for j in range(len(new_weights)):
-                randomChance = random.randint(0,2)
-                if(randomChance==0):
-                    new_weights[j]-=tiny_disturbance
-                elif(randomChance==1):
-                    new_weights[j]+=tiny_disturbance
 
-            if(new_weights not in new_neighbours):
-                new_neighbours.append(new_weights)
+            copiarotas = routes.copy()
+
+            commonServ=[]
+
+            while(commonServ.len() < 1):
+                car1 = random.randrange(nveiculos)
+                car2 = random.randrange(nveiculos)
+
+                if(car1==car2):
+                    car2 = random.randrange(nveiculos)
+
+                 commonServ = commonServices(car1,car2,instancia)
+
+            servico=random.randrange(commonServ.len())
+
+            swapPatients(copiarotas[car1],copiarotas[car2],servico)
+
+            if copiarotas not in new_neighbours:
+                new_neighbours.append(copiarotas)
+
         return new_neighbours
+
+            
 
 
     episode=0
