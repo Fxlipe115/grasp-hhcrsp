@@ -134,24 +134,6 @@ class carService:
         self.end = e
 
 
-
-
-# Type of variable that will hold the time of start and end of a service given to a patient
-class serviceTime:
-    def __init__(self,start, end):
-        self.beg = start
-        self.end = end
-
-
-def howLate(carService,numNodes, patientlist):
-
-    if carService != None:
-        if carService.patient != 0 and carService.patient != numNodes -1:
-            lateness = carService.end - patientlist[carService.patient].timeWindowEnd
-            if(lateness>0):
-                return lateness
-    return 0
-
 #============================================================================REVIEW THIS FUNCTION BELOW FOR ME
 #Returns both the sum of all late services, and the biggest of all
 def allTheLateness(matrix, numNodes, patientList):
@@ -428,10 +410,6 @@ def localSearch(instance,patientList,routes,numberOfNeighbours):
         #iteration+=1
 
     return current_state
-
-def initialSolution(instance):
-    ncarros = instance.nbVehi
-    nPacientes = instance.nbNodes
 
 
 
