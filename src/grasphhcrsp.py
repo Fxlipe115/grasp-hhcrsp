@@ -167,7 +167,7 @@ def buildsDistanceList(visitedNodes,instance):
     i=0
     distances=[]
 
-    while(i<visitedNodes.len() - 1): # <=== doesn't go to the last element
+    while(i<len(visitedNodes) - 1): # <=== doesn't go to the last element
         origin = visitedNodes[i].node
         destination = visitedNodes[i+1].node
         distances.append(instance.d[origin][destination])
@@ -241,7 +241,7 @@ def objective(instance, carServiceMatrix, patientList):
 def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
 
     firstNode = visitedNodes[0].node
-    lastNode = visitedNodes[visitedNodes.len()-1].node
+    lastNode = visitedNodes[len(visitedNodes)-1].node
 
     xGarage = instance.x[0]
     yGarage = instance.y[0]
@@ -325,7 +325,7 @@ def custo():
     #TODO
 
 def selectsCandidate(rcl, alpha):
-    considerados = math.ceil(rcl.length() * alpha)
+    considerados = math.ceil(len(rcl) * alpha)
     rcl.sort(key=lambda x: x[3])
 
     return rcl[random.randrange(0,considerados)]
@@ -355,7 +355,7 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
 
     pendentes = geraPendentes(matrix,patientlist) 
 
-    while(pendentes.len() > 0):
+    while(len(pendentes) > 0):
         rcl = geraRCL(pendentes,instance.nbVehi,instance.a)
 
         chosen = selectsCandidate(rcl,alpha)
@@ -399,11 +399,11 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
         new_neighbours = []
         for i in range(0,numberOfNeighbours):
 
-            copiarotas = routes.copy()
+            copiarotas = copy(routes)
 
             commonServ=[]
 
-            while(commonServ.len() < 1):
+            while(len(commonServ) < 1):
                 car1 = random.randrange(nveiculos)
                 car2 = random.randrange(nveiculos)
 
@@ -412,7 +412,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
 
                  commonServ = commonServices(car1,car2,instancia)
 
-            servico=random.randrange(commonServ.len())
+            servico=random.randrange(len(commonServ))
 
             swapPatients(copiarotas[car1],copiarotas[car2],commonServ[servico])
 
