@@ -324,6 +324,16 @@ def selectsCandidate(rcl, alpha):
     pass
     #TODO
 
+def commonServices(veiculo1,veiculo2,instance):
+    common=[]
+    
+    for i in range(instance.nbServi):
+        if(instance.a[veiculo1][i] == 1 and instance.a[veiculo2][i]==1):
+            common.append(i)
+
+    return common
+
+
 
 def greedyRandomizedAlgortithm(alpha):
     # TODO
