@@ -470,7 +470,7 @@ def localSearch(S,instance,patientList,routes,numberOfNeighbours):
 
             teste = buildCarServiceMatrix(instance,patientlist,copiarotas)
 
-            if copiarotas not in new_neighbours and (TreatmentAfterWindowBegins(teste,patientlist) != False):
+            if copiarotas not in new_neighbours):
                 new_neighbours.append(copiarotas)
 
         return new_neighbours
