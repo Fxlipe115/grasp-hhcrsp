@@ -251,7 +251,7 @@ def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
     else:
         return False
 
-def TreatmentAfterWindowBegins(Allrouteslist,patientlist):
+def TreatmentAfterWindowBegins(Allrouteslist,patientlist): #<========= REVIEW
 
     for route in Allrouteslist:
         for service in route:
@@ -346,8 +346,6 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
     nveiculos = instance.nbVehi
 
     #TODOS CARROS SAEM DA GARAGEM:
-
-
     rotas=[[] for _ in range(nveiculos)]
 
     for i in range(nveiculos):
@@ -391,8 +389,15 @@ def f(S):
 def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     number_of_neighbours = 30
 
-    carServiceMatrix = buildCarServiceMatrix(instance,patientList,routes)
+
     current_state = copy(routes)
+    carServiceMatrix = buildCarServiceMatrix(instance,patientList,routes)
+    score_current = objective(instance, carServiceMatrix, patientList)
+
+    episode=0
+    iteration=0
+    data=[]
+    best_episode=-1
 
     def generate_Neighbours(numberOfNeighbours, routes, instancia, nveiculos):
 
@@ -421,47 +426,57 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
 
         return new_neighbours
 
-            
 
-
-    episode=0
-    iteration=0
-    data=[]
-    score_current = objective(instance, carServiceMatrix, patientList)
-    best_episode=-1
     for i in range(1):
+
+        print("Generating Neighbours\n")
         neighbours = generate_Neighbours(number_of_neighbours,weights)
-        best_neighbour = current_state
-        score_best_neighbour = objective(instance, carServiceMatrix, patientList)
-        episode+=1
-        best_score = score_current
+  #      best_neighbour = current_state
+  #      score_best_neighbour = objective(instance, carServiceMatrix, patientList)
+  #      episode+=1
+  #      best_score = score_current
         for current_neighbour in neighbours:
-            carServiceMatrix = buildCarServiceMatrix(instance,patientList,current_state)
-            cur_score = objective(instance, carServiceMatrix, patientList)
-            if cur_score < score_best_neighbour:
-                best_neighbour = current_neighbour
-                best_score = cur_score
-                best_episode=episode
-                data.append((iteration,episode,score_best_neighbour))
-            episode+=1
-        if score_best_neighbour > score_current:
-            current_state = best_neighbour
-        iteration+=1
+            carServiceMatrix = buildCarServiceMatrix(instance,patientList,current_neighbour) #Monta matriz do vizinho
+            neighbourScore = objective(instance, carServiceMatrix, patientList) #Calcula Score do vizinho
+            if neighbourScore < score_current:
+                print("Someone was better\n")
+                current_state = copy(current_neighbour)
+                score_current = neighbourScore
+            #    best_episode=episode
+            #    data.append((iteration,episode,score_best_neighbour))
+            #episode+=1
+        #if score_best_neighbour > score_current:
+        #    current_state = best_neighbour
+        #iteration+=1
 
     return current_state
 
 def GRASP(maxIter, alpha, patientServiceMatrix, patientList, instance):
+    
     score = float('inf')
-    for i in range(maxIter):
-        S = greedyRandomizedAlgortithm(alpha, patientServiceMatrix, patientList, instance)
-        if not isFeasible(S):
-            S = repairSolution(S)
-        S = localSearch(S)
-        if f(S) < score:
-            solution = S
-            score = f(S)
+    bestSolution=[]
+    bestScore = 10000
 
-    return solution
+    for i in range(maxIter):
+        
+        S = greedyRandomizedAlgortithm(alpha, patientServiceMatrix, patientList, instance) #Solução inicial gulosa
+        greedyServiceMatrix = buildCarServiceMatrix(instance,patientlist,S) #Monta tempos
+        greedyScore = objective(instance,greedyServiceMatrix,patientlist)
+
+        if(greedyScore < bestScore):
+            bestSolution = copy(S)
+            bestScore = greedyScore
+
+        S = localSearch(S)
+        ServiceMatrix = buildCarServiceMatrix(S)    #objective(instance, carServiceMatrix, patientList):
+        newscore = objective(instance,ServiceMatrix,patientlist)
+                                                    #def buildCarServiceMatrix(instance,patientList,routes):
+        if newscore < bestScore:
+            bestSolution = copy(S)
+            bestScore = newscore
+
+    print("best objective function result: ",best_score, "\n")
+    return bestSolution
 
 
 
@@ -495,11 +510,10 @@ if __name__ == '__main__':
 
 
     rows = instance.nbNodes
-    columns=2
+    columns= instance.nbServi
 
-    serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
-    serviceTimes[0] = None # <==== NODOS GARAGEM
-    serviceTimes[rows-1] = None
+    patientPerService = [[ -1 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
+    
 
     # serviceTimes[service1][service2]
 
