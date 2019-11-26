@@ -90,19 +90,19 @@ class HhcrspInstance:
             'nbServi' + '\n' + \
             str(self.nbServi) + '\n' + \
             'r' + '\n' + \
-            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.r)) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l), self.r)) + '\n' + \
             'DS' + '\n' + \
             ' '.join(str(x) for x in self.DS) + '\n' + \
             'a' + '\n' + \
-            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.a)) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l), self.a)) + '\n' + \
             'x' + '\n' + \
             ' '.join(str(x) for x in self.x) + '\n' + \
             'y' + '\n' + \
             ' '.join(str(x) for x in self.y) + '\n' + \
             'd' + '\n' + \
-            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.d)) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l), self.d)) + '\n' + \
             'p' + '\n' + \
-            '\n'.join(map(lambda l: ' '.join(str(x) for x in l) ,self.p)) + '\n' + \
+            '\n'.join(map(lambda l: ' '.join(str(x) for x in l), self.p)) + '\n' + \
             'mind' + '\n' + \
             ' '.join(str(x) for x in self.mind) + '\n' + \
             'maxd' + '\n' + \
@@ -257,7 +257,7 @@ def TreatmentAfterWindowBegins(Allrouteslist,patientlist):
         for service in route:
             if(patientlist[service.node] != None):
                 if(service.start < patientlist[service.node].timeWindowBegin):
-                return False
+                    return False
     return True
 
 def noNegatives(Allrouteslist, numbernodes):      #RESTRIÇÃO (14) DO ARTIGO
