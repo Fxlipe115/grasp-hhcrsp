@@ -188,10 +188,7 @@ def getProcessingTime(instance,patientIdx,vehicleIdx,serviceIdx):
     return instance.p[patientIdx*instance.nbVehi+vehicleIdx][serviceIdx]
 
 def buildCarServiceMatrix(instance,patientList,routes): #<========= felipe
-    
-    invalidService = carService(-1,-1,-1,-1)
-
-    newmatrix = [[ invalidService for i in range(instance.nbNodes) ] for j in range(instance.nbVehi)]
+    newmatrix = [[ carService(-1,-1,-1,-1) for i in range(instance.nbNodes) ] for j in range(instance.nbVehi)]
 
     indexlinha=0
     indexcoluna=0
