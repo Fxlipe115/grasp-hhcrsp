@@ -224,12 +224,12 @@ def whoServedit(listofAllroutes, nservices, npatients):
 
 #listofVehiclesRoutes = List of lists, number of vehicles X maximum number of houses visiteds by a vehicle
 #patientsTimes = a list of lists of elements of type serviceTime
-def objective(listofVehiclesRoutes , patientsTimes):
+def objective(instance, carServiceMatrix, numNodes, patientList):
 
     for car in listofVehicles:
-        totalDistance += sum(buildsDistanceList( listofVehiclesRoutes[car]) )
+        totalDistance += sum(buildsDistanceList(instance))
 
-    lateness,biggestLate,listlates = AlltheLateness(patientsTimes)
+    lateness,biggestLate = allTheLateness(carServiceMatrix, numNodes, patientList)
 
     objectiveValue = totalDistance + latness + biggestLate
 
