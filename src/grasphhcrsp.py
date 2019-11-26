@@ -141,7 +141,7 @@ class serviceTime:
     def __init__(self,start, end):
         self.beg = start
         self.end = end
-        
+
 
 def howLate(carService,numNodes, patientlist):
 
@@ -205,7 +205,9 @@ def buildCarServiceMatrix(instance,patientList,routes): #<========= felipe
             print(newmatrix[indexlinha][indexcoluna].patient, " FOR CAR", indexcoluna)
             if indexcoluna != 0 and indexcoluna!= len(routes[indexlinha])-1 and indexcoluna < len(routes[indexlinha])-1:
                 newmatrix[indexlinha][indexcoluna].start = tempofinalanterior + instance.d[routes[indexlinha][indexcoluna][0]][routes[indexlinha][indexcoluna-1][0]]
-                newmatrix[indexlinha][indexcoluna].end = newmatrix[indexlinha][indexcoluna].start + getProcessingTime(instance,routes[indexlinha][indexcoluna][0],indexlinha,routes[indexlinha][indexcoluna][1]) 
+                if newmatrix[indexlinha][indexcoluna].start < patientList[indexcoluna].timewindowbegin:
+                    newmatrix[indexlinha][indexcoluna].start = patientList[indexcoluna].timewindowbegin
+                newmatrix[indexlinha][indexcoluna].end = newmatrix[indexlinha][indexcoluna].start + getProcessingTime(instance,routes[indexlinha][indexcoluna][0],indexlinha,routes[indexlinha][indexcoluna][1])
                 tempofinalanterior = newmatrix[indexlinha][indexcoluna].end
             else:
                 newmatrix[indexlinha][indexcoluna].start = -1
@@ -352,7 +354,7 @@ def selectsCandidate(rcl, alpha):
 
 def commonServices(veiculo1,veiculo2,instance):
     common=[]
-    
+
     for i in range(instance.nbServi):
         if(instance.a[veiculo1][i] == 1 and instance.a[veiculo2][i]==1):
             common.append(i)
@@ -371,7 +373,7 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
     for i in range(nveiculos):
         rotas[i].append([0,-1])
 
-    pendentes = geraPendentes(matrix,patientlist,instance.nbServi) 
+    pendentes = geraPendentes(matrix,patientlist,instance.nbServi)
 
     while(len(pendentes) > 0):
         rcl = geraRCL(pendentes,instance.nbVehi,instance.a, patientlist)
@@ -382,7 +384,7 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
         matrix[chosen[1]][chosen[2]] = chosen[0]
 
         pendentes.remove([chosen[1],chosen[2]])     # Retira dos pendentes, o (paciente,serviço) que foi selecionado
-    
+
     for i in range(nveiculos):              #TODOS VEICULOS VOLTAM PRA GARAGEM
         rotas[i].append([0,-1])
 
@@ -394,16 +396,16 @@ def recalculaTempos(ServiceMatrix, patientlist,distancias,instance):
 
     linhas = len(ServiceMatrix)
     #distance=0                              #matriz[i][nodo].patient #matriz[i][nodo].serviço
-    
-    for i in range(linhas): 
-        tempofinalanterior=0                
+
+    for i in range(linhas):
+        tempofinalanterior=0
         for nodo in range(len(ServiceMatrix[i])):
             if(nodo!=0):
                 tempoinicial = tempofinalanterior+distancias[ServiceMatrix[i][nodo].patient][ServiceMatrix[i][nodo-1].patient]
                 if(tempoinicial < patientlist[ServiceMatrix[i][nodo].patient].timeWindowBegin):
                     tempoinicial = patientlist[nodo].timeWindowBegin
                 tempofinal= tempoinicial + getProcessingTime(instance,ServiceMatrix[i][nodo].patient,i,ServiceMatrix[i][nodo].service)
-                
+
                 ServiceMatrix[i][nodo].start = tempoinicial
                 ServiceMatrix[i][nodo].end = tempofinal
 
@@ -430,7 +432,7 @@ def f(S):
     # TODO
     return float('inf')
 
-def localSearch(self,instance,patientList,routes,numberOfNeighbours):
+def localSearch(S,instance,patientList,routes,numberOfNeighbours):
     number_of_neighbours = 30
 
 
@@ -465,7 +467,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
 
             swapPatients(copiarotas[car1],copiarotas[car2],commonServ[servico])
 
-            
+
             teste = buildCarServiceMatrix(instance,patientlist,copiarotas)
 
             if copiarotas not in new_neighbours and (TreatmentAfterWindowBegins(teste,patientlist) != False):
@@ -499,13 +501,13 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     return current_state
 
 def GRASP(maxIter, alpha, patientList, instance):
-    
+
     score = float('inf')
     bestSolution=[]
     bestScore = 10000
 
     for i in range(maxIter):
-        
+
         patientServiceMatrix = [[ -1 for i in range(columns) ] for j in range(rows)]
 
         S = greedyRandomizedAlgortithm(alpha, patientServiceMatrix, patientList, instance) #Solução inicial gulosa
@@ -565,7 +567,7 @@ if __name__ == '__main__':
     print("result")
 
      # <==== Initializing matrix of services given
-    
+
 
     # serviceTimes[service1][service2]
 
