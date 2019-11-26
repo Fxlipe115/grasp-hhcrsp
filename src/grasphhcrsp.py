@@ -338,11 +338,32 @@ def commonServices(veiculo1,veiculo2,instance):
 
     return common
 
+#PENDENTES = (id paciente, id serviço)
+#RCL = (id veículo, id paciente, id serviço, custo de atribuição na rota)
 
+def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,rotas,nveiculos):
 
-def greedyRandomizedAlgortithm(alpha):
+    #TODOS CARROS SAEM DA GARAGEM:
+
+    for i in range(nveiculos):
+        rotas[i][0] = [0,-1]
+
+    pendentes = geraPendentes(matrix,patientlist) 
+
+    while(pendentes.len() > 0):
+        rcl = geraRCL(pendentes,instance.nbVehi,instance.a)
+
+        chosen = selectsCandidate(rcl,alpha)
+
+        rotas[chosen[0]].append([chosen[1], chosen[2]]) #rotas[veiculo escolhido].append(paciente escolhido, serviço escolhido)
+        matrix[chosen[1]][chosen[2]] = t[0]
+
+        pendentes.remove([chosen[1],chosen[2]])
     
-    pass
+    for i in range(nveiculos):              #TODOS VEICULOS VOLTAM PRA GARAGEM
+        rotas[i].append([0,-1])
+
+    return rotas
 
 def isFeasible(S):
     # TODO
