@@ -3,6 +3,8 @@
 import argparse
 import sys
 from functools import reduce
+import random
+import math
 
 
 
@@ -192,10 +194,10 @@ def buildCarServiceMatrix(instance,patientList,routes):
 
 
 def canItServeIt(vehicle,patient,service,instance): # ============ REVIEW THIS FUNCTION PLS
-    
+
     if(instance.a[vehicle][service] == patient.requiredServices[service]):
             return true
-    
+
     return false
 
 
@@ -254,7 +256,7 @@ def TreatmentAfterWindowBegins(Allrouteslist,patientlist):
         for service in route:
             if(patientlist[service.node] != None):
                 if(service.start < patientlist[service.node].timeWindowBegin):
-                return False 
+                return False
     return True
 
 def noNegatives(Allrouteslist, numbernodes):      #RESTRIÇÃO (14) DO ARTIGO
@@ -270,7 +272,7 @@ def noNegatives(Allrouteslist, numbernodes):      #RESTRIÇÃO (14) DO ARTIGO
 
 #checa uma linha da matriz de solução       RESTRIÇÃO (8) <====MELHORAR C DISTANCIAS
 def timesAreIncreasing(visitedNodes):
-    
+
     tempoanterior = 0
     nodoanterior=0
 
@@ -291,7 +293,7 @@ def allServicesDone(patientlist,servedBy):
         if patient != None:
             for i in range(nbServi):
                 if(patient.requiredServices[i]==1 and servedBy[index][i] == -1):
-                    return False 
+                    return False
         index+=1
 
     return True
@@ -299,13 +301,13 @@ def allServicesDone(patientlist,servedBy):
 def geraPendentes(matriz,listadepacientes):
 
     pendentes=[]
-    
+
     for paciente in matriz:
         for serviço in range(paciente.len()):
             if(listadepacientes[serviço]==1 and matriz[paciente][serviço]==-1):
                 pendentes.append([paciente,serviço])
 
-    return pendentes 
+    return pendentes
 
 #recebe lista de serviços pendentes, numero de veiculos e a lista dos serviços dos veiculos
 def geraRCL(pendentes, nveiculos, servicosveiculos):
@@ -313,16 +315,19 @@ def geraRCL(pendentes, nveiculos, servicosveiculos):
     for services in pendentes:
         for i in range(nveiculos):
             if (servicosveiculos[i][services[1]] == 1):
-                rcl.append([i,pendentes[0],pendentes[1],custo()])
+                rcl.append([i,pendentes[0],pendentes[1],custo()]) #carro serviço nodo custo
 
-    return rcl 
+    return rcl
 
 def custo():
     pass
     #TODO
+
 def selectsCandidate(rcl, alpha):
-    pass
-    #TODO
+    considerados = math.ceil(rcl.length() * alpha)
+    rcl.sort(key=lambda x: x[3])
+
+    return rcl[random.randrange(0,considerados)]
 
 def commonServices(veiculo1,veiculo2,instance):
     common=[]
@@ -336,7 +341,7 @@ def commonServices(veiculo1,veiculo2,instance):
 
 
 def greedyRandomizedAlgortithm(alpha):
-    # TODO
+    
     pass
 
 def isFeasible(S):
@@ -400,7 +405,7 @@ if __name__ == '__main__':
 
 
 
-    rows = instance.nbNodes 
+    rows = instance.nbNodes
     columns=2
 
     serviceTimes = [[ 0 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
@@ -409,7 +414,7 @@ if __name__ == '__main__':
 
     # serviceTimes[service1][service2]
 
-    
+
 
 
     # always pass file=out parameter to print
