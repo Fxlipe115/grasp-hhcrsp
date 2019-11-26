@@ -154,10 +154,18 @@ def howLate(carService,numNodes, patientlist):
 #============================================================================REVIEW THIS FUNCTION BELOW FOR ME
 #Returns both the sum of all late services, and the biggest of all
 def allTheLateness(matrix, numNodes, patientList):
-    allServices = reduce(lambda x,y: x+y, matrix,[])
-    listOfLates= map(lambda x: howLate(x,numNodes,patientList), allServices)
 
-    return sum(listOfLates), max(listOfLates)
+    late=0
+    listlates=[]
+
+    for car in matrix:
+        for carserv in car:
+            if(carserv.patient!=0 and carserv.patient != -1):
+                late=carserv.end - patientlist[carserv.patient].timeWindowEnd
+                if late > 0:
+                    listlates.append(late)
+
+    return sum(listlates), max(listlates)
 
 
 #Receives a list of visited nodes of ONE CAR and spits the distance list between all of them
@@ -168,8 +176,8 @@ def buildsDistanceList(visitedNodes,instance):
     distances=[]
 
     while(i<len(visitedNodes) - 1): # <=== doesn't go to the last element
-        origin = visitedNodes[i].node
-        destination = visitedNodes[i+1].node
+        origin = visitedNodes[i].patient
+        destination = visitedNodes[i+1].patient
         distances.append(instance.d[origin][destination])
         i+=1
 
@@ -179,19 +187,36 @@ def buildsDistanceList(visitedNodes,instance):
 def getProcessingTime(instance,patientIdx,vehicleIdx,serviceIdx):
     return instance.p[patientIdx*instance.nbVehi+vehicleIdx][serviceIdx]
 
-def buildCarServiceMatrix(instance,patientList,routes):
-    timesMatrix = []
-    for vehicleIdx,route in enumerate(routes):
-        times = [0]*instance.nbNodes
-        for i in range(1,len(route)):
-            times[i] = times[i-1] + getProcessingTime(instance,route[i][0],vehicleIdx,route[i][1])
-        timesMatrix.append(times)
+def buildCarServiceMatrix(instance,patientList,routes): #<========= felipe
+    
+    invalidService = carService(-1,-1,-1,-1)
 
-    carServiceMatrix = [[None]*instance.nbNodes for _ in range(instance.nbVehi)]
-    for vehicleIdx,route in enumerate(routes):
-        for i in range(1,len(route)-1):
-            cs = carService(patientList[patientIdx],route[i][1],timesMatrix[vehicleIdx][route[i][0]],timesMatrix[vehicleIdx][route[i][0]]+getProcessingTime(instance,route[i][0],vehicleIdx,route[i][1]))
-            carServiceMatrix[vehicleIdx][route[i][0]] = cs
+    newmatrix = [[ invalidService for i in range(instance.nbNodes) ] for j in range(instance.nbVehi)]
+
+    indexlinha=0
+    indexcoluna=0
+
+    tempofinalanterior=0            #route[0][0] = [nodo,serviço] #route[0][1] = [nodo1,serviço1]
+
+    for car in routes:
+        for service in car:
+            newmatrix[indexlinha][indexcoluna].patient = service[0]
+            newmatrix[indexlinha][indexcoluna].service = service[1]
+
+            print(service," ############################")
+            print(newmatrix[indexlinha][indexcoluna].patient, " FOR CAR", indexcoluna)
+            if(indexcoluna != 0 and indexcoluna!= len(routes[indexlinha])-1):
+                newmatrix[indexlinha][indexcoluna].start = tempofinalanterior + instance.d[routes[indexlinha][indexcoluna][0]][routes[indexlinha][indexcoluna-1][0]]
+                newmatrix[indexlinha][indexcoluna].end = newmatrix[indexlinha][indexcoluna].start + getProcessingTime(instance,routes[indexlinha][indexcoluna][0],indexlinha,routes[indexlinha][indexcoluna][1]) 
+                tempofinalanterior = newmatrix[indexlinha][indexcoluna].end
+            else:
+                newmatrix[indexlinha][indexcoluna].start = -1
+                newmatrix[indexlinha][indexcoluna].end = -1
+        indexcoluna+=1
+    indexlinha+=1
+
+    print(newmatrix[1][2].patient)
+    return newmatrix
 
 
 def canItServeIt(vehicle,patient,service,instance): # ============ REVIEW THIS FUNCTION PLS
@@ -218,8 +243,6 @@ def whoServedit(listofAllroutes, nservices, npatients):
 
 
 
-
-
 # soma dos seguintes fatores seja mínima:  Distâncias percorridas pelos veículos;
 # Soma dos atrasos nos atendimentos; Tempo do maior atraso observado na solução.
 
@@ -227,6 +250,7 @@ def whoServedit(listofAllroutes, nservices, npatients):
 #patientsTimes = a list of lists of elements of type serviceTime
 def objective(instance, carServiceMatrix, patientList):
 
+    totalDistance=0
     for car in carServiceMatrix:
         totalDistance += sum(buildsDistanceList(car, instance))
 
@@ -251,7 +275,7 @@ def outAndBackToGarage(visitedNodes):  #RESTRIÇÃO (5) DO ARTIGO
     else:
         return False
 
-def TreatmentAfterWindowBegins(Allrouteslist,patientlist): #<========= REVIEW
+def TreatmentAfterWindowBegins(Allrouteslist,patientlist): #<========= REVIEW <===NODE?
 
     for route in Allrouteslist:
         for service in route:
@@ -299,30 +323,30 @@ def allServicesDone(patientlist,servedBy):
 
     return True
 
-def geraPendentes(matriz,listadepacientes):
+def geraPendentes(matriz,listadepacientes,numser):
 
     pendentes=[]
 
-    for i,paciente in enumerate(matriz):
-        for servico in range(len(paciente)):
-            if listadepacientes[i].requiredServices[servico]==1 and paciente[servico]==-1:
-                pendentes.append([paciente,servico])
+    for paciente in range(len(matriz)):
+        for service in range(numser):
+            if(listadepacientes[paciente]!= None and listadepacientes[paciente].requiredServices[service]==1 and matriz[paciente][service]==-1):
+                pendentes.append([paciente,service])
 
     return pendentes
 
 #recebe lista de serviços pendentes, numero de veiculos e a lista dos serviços dos veiculos
-def geraRCL(pendentes, nveiculos, servicosveiculos):
+def geraRCL(pendentes, nveiculos, servicosveiculos,patientlist):
     rcl = []
     for services in pendentes:
+      #  print(services[0],"AAAAAAAAAAAAAAAAAAAAAAAA")
         for i in range(nveiculos):
             if (servicosveiculos[i][services[1]] == 1):
-                rcl.append([i,pendentes[0],pendentes[1],custo()]) #carro serviço nodo custo
+                rcl.append([i,services[0],services[1],custo(services[0],patientlist)]) #carro serviço nodo custo
 
     return rcl
 
-def custo():
-    pass
-    #TODO
+def custo(patient,patientlist):
+    return patientlist[patient].timeWindowBegin
 
 def selectsCandidate(rcl, alpha):
     considerados = math.ceil(len(rcl) * alpha)
@@ -351,22 +375,46 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
     for i in range(nveiculos):
         rotas[i].append([0,-1])
 
-    pendentes = geraPendentes(matrix,patientlist) 
+    pendentes = geraPendentes(matrix,patientlist,instance.nbServi) 
 
     while(len(pendentes) > 0):
-        rcl = geraRCL(pendentes,instance.nbVehi,instance.a)
+        rcl = geraRCL(pendentes,instance.nbVehi,instance.a, patientlist)
 
         chosen = selectsCandidate(rcl,alpha)
 
         rotas[chosen[0]].append([chosen[1], chosen[2]]) #rotas[veiculo escolhido].append(paciente escolhido, serviço escolhido)
-        matrix[chosen[1]][chosen[2]] = t[0]
+        matrix[chosen[1]][chosen[2]] = chosen[0]
 
         pendentes.remove([chosen[1],chosen[2]])     # Retira dos pendentes, o (paciente,serviço) que foi selecionado
     
     for i in range(nveiculos):              #TODOS VEICULOS VOLTAM PRA GARAGEM
         rotas[i].append([0,-1])
 
+    print(rotas)
+
     return rotas
+
+def recalculaTempos(ServiceMatrix, patientlist,distancias,instance):
+
+    linhas = len(ServiceMatrix)
+    #distance=0                              #matriz[i][nodo].patient #matriz[i][nodo].serviço
+    
+    for i in range(linhas): 
+        tempofinalanterior=0                
+        for nodo in range(len(ServiceMatrix[i])):
+            if(nodo!=0):
+                tempoinicial = tempofinalanterior+distancias[ServiceMatrix[i][nodo].patient][ServiceMatrix[i][nodo-1].patient]
+                if(tempoinicial < patientlist[ServiceMatrix[i][nodo].patient].timeWindowBegin):
+                    tempoinicial = patientlist[nodo].timeWindowBegin
+                tempofinal= tempoinicial + getProcessingTime(instance,ServiceMatrix[i][nodo].patient,i,ServiceMatrix[i][nodo].service)
+                
+                ServiceMatrix[i][nodo].start = tempoinicial
+                ServiceMatrix[i][nodo].end = tempofinal
+
+                tempofinalanterior = tempofinal
+
+
+
 
 def swapPatients(route1,route2,service):
     patient1Idx = list(map(lambda x: x[1], route1)).index(service)
@@ -399,7 +447,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     data=[]
     best_episode=-1
 
-    def generate_Neighbours(numberOfNeighbours, routes, instancia, nveiculos):
+    def generate_Neighbours(numberOfNeighbours, routes, instancia, nveiculos,patientlist):
 
         new_neighbours = []
         for i in range(0,numberOfNeighbours):
@@ -415,13 +463,16 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
                 if(car1==car2):
                     car2 = random.randrange(nveiculos)
 
-                 commonServ = commonServices(car1,car2,instancia)
+                commonServ = commonServices(car1,car2,instancia)
 
             servico=random.randrange(len(commonServ))
 
             swapPatients(copiarotas[car1],copiarotas[car2],commonServ[servico])
 
-            if copiarotas not in new_neighbours:
+            
+            teste = buildCarServiceMatrix(instance,patientlist,copiarotas)
+
+            if copiarotas not in new_neighbours and (TreatmentAfterWindowBegins(teste,patientlist) != False):
                 new_neighbours.append(copiarotas)
 
         return new_neighbours
@@ -430,7 +481,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     for i in range(1):
 
         print("Generating Neighbours\n")
-        neighbours = generate_Neighbours(number_of_neighbours,weights)
+        neighbours = generate_Neighbours(number_of_neighbours,current_state,instance,instance.nbVehi,patientlist)
   #      best_neighbour = current_state
   #      score_best_neighbour = objective(instance, carServiceMatrix, patientList)
   #      episode+=1
@@ -451,7 +502,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
 
     return current_state
 
-def GRASP(maxIter, alpha, patientServiceMatrix, patientList, instance):
+def GRASP(maxIter, alpha, patientList, instance):
     
     score = float('inf')
     bestSolution=[]
@@ -459,9 +510,11 @@ def GRASP(maxIter, alpha, patientServiceMatrix, patientList, instance):
 
     for i in range(maxIter):
         
+        patientServiceMatrix = [[ -1 for i in range(columns) ] for j in range(rows)]
+
         S = greedyRandomizedAlgortithm(alpha, patientServiceMatrix, patientList, instance) #Solução inicial gulosa
-        greedyServiceMatrix = buildCarServiceMatrix(instance,patientlist,S) #Monta tempos
-        greedyScore = objective(instance,greedyServiceMatrix,patientlist)
+        greedyServiceMatrix = buildCarServiceMatrix(instance,patientList,S) #Monta tempos
+        greedyScore = objective(instance,greedyServiceMatrix,patientList)
 
         if(greedyScore < bestScore):
             bestSolution = copy(S)
@@ -512,7 +565,10 @@ if __name__ == '__main__':
     rows = instance.nbNodes
     columns= instance.nbServi
 
-    patientPerService = [[ -1 for i in range(columns) ] for j in range(rows)] # <==== Initializing matrix of services given
+    result=GRASP(5,0.5,listPatients,instance)
+    print("result")
+
+     # <==== Initializing matrix of services given
     
 
     # serviceTimes[service1][service2]
