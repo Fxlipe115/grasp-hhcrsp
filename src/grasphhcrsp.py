@@ -387,6 +387,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     number_of_neighbours = 30
 
     carServiceMatrix = buildCarServiceMatrix(instance,patientList,routes)
+    current_state = copy(routes)
 
     def generate_Neighbours(numberOfNeighbours, routes):
         new_neighbours = []
@@ -409,15 +410,16 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     data=[]
     score_current = objective(instance, carServiceMatrix, patientList)
     best_episode=-1
-    for i in range(30):
+    for i in range(1):
         neighbours = generate_Neighbours(number_of_neighbours,weights)
         best_neighbour = current_state
         score_best_neighbour = objective(instance, carServiceMatrix, patientList)
         episode+=1
         best_score = score_current
         for current_neighbour in neighbours:
-            cur_score = self.run_episode(current_neighbour)
-            if cur_score  > score_best_neighbour:
+            carServiceMatrix = buildCarServiceMatrix(instance,patientList,current_state)
+            cur_score = objective(instance, carServiceMatrix, patientList)
+            if cur_score < score_best_neighbour:
                 best_neighbour = current_neighbour
                 best_score = cur_score
                 best_episode=episode
