@@ -5,6 +5,7 @@ import sys
 from functools import reduce
 import random
 import math
+from copy import copy
 
 
 
