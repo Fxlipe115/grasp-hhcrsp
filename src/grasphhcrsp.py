@@ -342,7 +342,7 @@ def commonServices(veiculo1,veiculo2,instance):
 #PENDENTES = (id paciente, id serviço)
 #RCL = (id veículo, id paciente, id serviço, custo de atribuição na rota)
 
-def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,rotas,nveiculos):
+def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,nveiculos):
 
     #TODOS CARROS SAEM DA GARAGEM:
 
