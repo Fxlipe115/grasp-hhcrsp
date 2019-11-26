@@ -342,7 +342,8 @@ def commonServices(veiculo1,veiculo2,instance):
 #PENDENTES = (id paciente, id serviço)
 #RCL = (id veículo, id paciente, id serviço, custo de atribuição na rota)
 
-def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,nveiculos):
+def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
+    nveiculos = instance.nbVehi
 
     #TODOS CARROS SAEM DA GARAGEM:
 
@@ -435,10 +436,10 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
 
     return current_state
 
-def GRASP(maxIter, alpha):
+def GRASP(maxIter, alpha, patientServiceMatrix, patientList, instance):
     score = float('inf')
     for i in range(maxIter):
-        S = greedyRandomizedAlgortithm(alpha)
+        S = greedyRandomizedAlgortithm(alpha, patientServiceMatrix, patientList, instance)
         if not isFeasible(S):
             S = repairSolution(S)
         S = localSearch(S)
