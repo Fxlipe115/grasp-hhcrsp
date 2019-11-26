@@ -201,19 +201,19 @@ def buildCarServiceMatrix(instance,patientList,routes): #<========= felipe
             newmatrix[indexlinha][indexcoluna].patient = service[0]
             newmatrix[indexlinha][indexcoluna].service = service[1]
 
-            print(service," ############################")
-            print(newmatrix[indexlinha][indexcoluna].patient, " FOR CAR", indexcoluna)
+            #print(service," ############################")
+            #print(newmatrix[indexlinha][indexcoluna].patient, " FOR CAR", indexcoluna)
             if indexcoluna != 0 and indexcoluna!= len(routes[indexlinha])-1 and indexcoluna < len(routes[indexlinha])-1:
                 newmatrix[indexlinha][indexcoluna].start = tempofinalanterior + instance.d[routes[indexlinha][indexcoluna][0]][routes[indexlinha][indexcoluna-1][0]]
-                if newmatrix[indexlinha][indexcoluna].start < patientList[indexcoluna].timewindowbegin:
-                    newmatrix[indexlinha][indexcoluna].start = patientList[indexcoluna].timewindowbegin
+                if newmatrix[indexlinha][indexcoluna].start < patientList[indexcoluna].timeWindowBegin:
+                    newmatrix[indexlinha][indexcoluna].start = patientList[indexcoluna].timeWindowBegin
                 newmatrix[indexlinha][indexcoluna].end = newmatrix[indexlinha][indexcoluna].start + getProcessingTime(instance,routes[indexlinha][indexcoluna][0],indexlinha,routes[indexlinha][indexcoluna][1])
                 tempofinalanterior = newmatrix[indexlinha][indexcoluna].end
             else:
                 newmatrix[indexlinha][indexcoluna].start = -1
                 newmatrix[indexlinha][indexcoluna].end = -1
 
-    print(newmatrix[1][2].patient)
+    #print(newmatrix[1][2].patient)
     return newmatrix
 
 
@@ -355,11 +355,11 @@ def selectsCandidate(rcl, alpha):
 def commonServices(veiculo1,veiculo2,instance):
     common=[]
 
-    for i in range(instance.nbServi):
-        if(instance.a[veiculo1][i] == 1 and instance.a[veiculo2][i]==1):
-            common.append(i)
+#    for i in range(instance.nbServi):
+#        if(instance.a[veiculo1][i] == 1 and instance.a[veiculo2][i]==1):
+#            common.append(i)
 
-    return common
+    return list(set(map(lambda x: x[1],veiculo1)).intersection(set(map(lambda x: x[1],veiculo2))))
 
 #PENDENTES = (id paciente, id serviço)
 #RCL = (id veículo, id paciente, id serviço, custo de atribuição na rota)
@@ -388,7 +388,7 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance):
     for i in range(nveiculos):              #TODOS VEICULOS VOLTAM PRA GARAGEM
         rotas[i].append([0,-1])
 
-    print(rotas)
+    #print(rotas)
 
     return rotas
 
@@ -432,7 +432,7 @@ def f(S):
     # TODO
     return float('inf')
 
-def localSearch(S,instance,patientList,routes,numberOfNeighbours):
+def localSearch(instance,patientList,routes,numberOfNeighbours):
     number_of_neighbours = 30
 
 
@@ -461,7 +461,9 @@ def localSearch(S,instance,patientList,routes,numberOfNeighbours):
                 if(car1==car2):
                     car2 = random.randrange(nveiculos)
 
-                commonServ = commonServices(car1,car2,instancia)
+                commonServ = commonServices(copiarotas[car1],copiarotas[car2],instancia)
+            #print(commonServ)
+            #print(copiarotas[car1],copiarotas[car2])
 
             servico=random.randrange(len(commonServ))
 
@@ -470,7 +472,7 @@ def localSearch(S,instance,patientList,routes,numberOfNeighbours):
 
             teste = buildCarServiceMatrix(instance,patientlist,copiarotas)
 
-            if copiarotas not in new_neighbours):
+            if copiarotas not in new_neighbours:
                 new_neighbours.append(copiarotas)
 
         return new_neighbours
@@ -478,8 +480,8 @@ def localSearch(S,instance,patientList,routes,numberOfNeighbours):
 
     for i in range(1):
 
-        print("Generating Neighbours\n")
-        neighbours = generate_Neighbours(number_of_neighbours,current_state,instance,instance.nbVehi,patientlist)
+        #print("Generating Neighbours\n")
+        neighbours = generate_Neighbours(routes,number_of_neighbours,current_state,instance,instance.nbVehi,patientList)
   #      best_neighbour = current_state
   #      score_best_neighbour = objective(instance, carServiceMatrix, patientList)
   #      episode+=1
@@ -488,7 +490,7 @@ def localSearch(S,instance,patientList,routes,numberOfNeighbours):
             carServiceMatrix = buildCarServiceMatrix(instance,patientList,current_neighbour) #Monta matriz do vizinho
             neighbourScore = objective(instance, carServiceMatrix, patientList) #Calcula Score do vizinho
             if neighbourScore < score_current:
-                print("Someone was better\n")
+                #print("Someone was better\n")
                 current_state = copy(current_neighbour)
                 score_current = neighbourScore
             #    best_episode=episode
@@ -518,16 +520,15 @@ def GRASP(maxIter, alpha, patientList, instance):
             bestSolution = copy(S)
             bestScore = greedyScore
 
-        S = localSearch(S,instance,patientList,routes,numberOfNeighbours)
-        ServiceMatrix = buildCarServiceMatrix(S)    #objective(instance, carServiceMatrix, patientList):
-        newscore = objective(instance,ServiceMatrix,patientlist)
+        S = localSearch(instance,patientList,S,10)
+        ServiceMatrix = buildCarServiceMatrix(instance,patientList,S)    #objective(instance, carServiceMatrix, patientList):
+        newscore = objective(instance,ServiceMatrix,patientList)
                                                     #def buildCarServiceMatrix(instance,patientList,routes):
         if newscore < bestScore:
             bestSolution = copy(S)
             bestScore = newscore
 
-    print("best objective function result: ",best_score, "\n")
-    return bestSolution
+    return bestSolution,bestScore
 
 
 
@@ -537,7 +538,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GRASP-GGCRSP')
     parser.add_argument('-f', dest='file', required=True, help='The instance file.\n')
     parser.add_argument('-o', dest='outfile', help='Output Filename, for best solution and time elapsed')
+    parser.add_argument('-x', dest='repetitions', help='Output Filename, for best solution and time elapsed')
+    parser.add_argument('-a', dest='alpha', help='Output Filename, for best solution and time elapsed')
 
+    random.seed()
     args = parser.parse_args()
     out = sys.stdout if args.outfile is None else open(args.outfile, 'w')
 
@@ -563,8 +567,8 @@ if __name__ == '__main__':
     rows = instance.nbNodes
     columns= instance.nbServi
 
-    result=GRASP(5,0.5,listPatients,instance)
-    print("result")
+    result,score=GRASP(int(args.repetitions),float(args.alpha),listPatients,instance)
+    print(score)
 
      # <==== Initializing matrix of services given
 
