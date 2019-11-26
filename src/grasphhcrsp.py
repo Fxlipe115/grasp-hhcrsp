@@ -414,7 +414,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
 
             servico=random.randrange(commonServ.len())
 
-            swapPatients(copiarotas[car1],copiarotas[car2],servico)
+            swapPatients(copiarotas[car1],copiarotas[car2],commonServ[servico])
 
             if copiarotas not in new_neighbours:
                 new_neighbours.append(copiarotas)
