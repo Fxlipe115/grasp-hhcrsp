@@ -346,8 +346,11 @@ def greedyRandomizedAlgortithm(alpha,matrix,patientlist,instance,rotas,nveiculos
 
     #TODOS CARROS SAEM DA GARAGEM:
 
+
+    rotas=[[] for _ in range(nveiculos)]
+
     for i in range(nveiculos):
-        rotas[i][0] = [0,-1]
+        rotas[i].append([0,-1])
 
     pendentes = geraPendentes(matrix,patientlist) 
 
