@@ -226,8 +226,8 @@ def whoServedit(listofAllroutes, nservices, npatients):
 #patientsTimes = a list of lists of elements of type serviceTime
 def objective(instance, carServiceMatrix, patientList):
 
-    for car in listofVehicles:
-        totalDistance += sum(buildsDistanceList(instance))
+    for car in carServiceMatrix:
+        totalDistance += sum(buildsDistanceList(car, instance))
 
     lateness,biggestLate = allTheLateness(carServiceMatrix, instance.nbNodes, patientList)
 
