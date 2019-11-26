@@ -296,6 +296,33 @@ def allServicesDone(patientlist,servedBy):
 
     return True
 
+def geraPendentes(matriz,listadepacientes):
+
+    pendentes=[]
+    
+    for paciente in matriz:
+        for serviço in range(paciente.len()):
+            if(listadepacientes[serviço]==1 and matriz[paciente][serviço]==-1):
+                pendentes.append([paciente,serviço])
+
+    return pendentes 
+
+#recebe lista de serviços pendentes, numero de veiculos e a lista dos serviços dos veiculos
+def geraRCL(pendentes, nveiculos, servicosveiculos):
+    rcl = []
+    for services in pendentes:
+        for i in range(nveiculos):
+            if (servicosveiculos[i][services[1]] == 1):
+                rcl.append([i,pendentes[0],pendentes[1],custo()])
+
+    return rcl 
+
+def custo():
+    pass
+    #TODO
+def selectsCandidate(rcl, alpha):
+    pass
+    #TODO
 
 
 def greedyRandomizedAlgortithm(alpha):
