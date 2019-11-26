@@ -162,7 +162,7 @@ def allTheLateness(matrix, numNodes, patientList):
     for car in matrix:
         for carserv in car:
             if(carserv.patient!=0 and carserv.patient != -1):
-                late=carserv.end - patientlist[carserv.patient].timeWindowEnd
+                late=carserv.end - patientList[carserv.patient].timeWindowEnd
                 if late > 0:
                     listlates.append(late)
 
@@ -196,22 +196,20 @@ def buildCarServiceMatrix(instance,patientList,routes): #<========= felipe
 
     tempofinalanterior=0            #route[0][0] = [nodo,serviço] #route[0][1] = [nodo1,serviço1]
 
-    for car in routes:
-        for service in car:
+    for indexlinha,car in enumerate(routes):
+        for indexcoluna,service in enumerate(car):
             newmatrix[indexlinha][indexcoluna].patient = service[0]
             newmatrix[indexlinha][indexcoluna].service = service[1]
 
             print(service," ############################")
             print(newmatrix[indexlinha][indexcoluna].patient, " FOR CAR", indexcoluna)
-            if(indexcoluna != 0 and indexcoluna!= len(routes[indexlinha])-1):
+            if indexcoluna != 0 and indexcoluna!= len(routes[indexlinha])-1 and indexcoluna < len(routes[indexlinha])-1:
                 newmatrix[indexlinha][indexcoluna].start = tempofinalanterior + instance.d[routes[indexlinha][indexcoluna][0]][routes[indexlinha][indexcoluna-1][0]]
                 newmatrix[indexlinha][indexcoluna].end = newmatrix[indexlinha][indexcoluna].start + getProcessingTime(instance,routes[indexlinha][indexcoluna][0],indexlinha,routes[indexlinha][indexcoluna][1]) 
                 tempofinalanterior = newmatrix[indexlinha][indexcoluna].end
             else:
                 newmatrix[indexlinha][indexcoluna].start = -1
                 newmatrix[indexlinha][indexcoluna].end = -1
-        indexcoluna+=1
-    indexlinha+=1
 
     print(newmatrix[1][2].patient)
     return newmatrix
@@ -445,7 +443,7 @@ def localSearch(self,instance,patientList,routes,numberOfNeighbours):
     data=[]
     best_episode=-1
 
-    def generate_Neighbours(numberOfNeighbours, routes, instancia, nveiculos,patientlist):
+    def generate_Neighbours(S,numberOfNeighbours, routes, instancia, nveiculos,patientlist):
 
         new_neighbours = []
         for i in range(0,numberOfNeighbours):
@@ -518,7 +516,7 @@ def GRASP(maxIter, alpha, patientList, instance):
             bestSolution = copy(S)
             bestScore = greedyScore
 
-        S = localSearch(S)
+        S = localSearch(S,instance,patientList,routes,numberOfNeighbours)
         ServiceMatrix = buildCarServiceMatrix(S)    #objective(instance, carServiceMatrix, patientList):
         newscore = objective(instance,ServiceMatrix,patientlist)
                                                     #def buildCarServiceMatrix(instance,patientList,routes):
